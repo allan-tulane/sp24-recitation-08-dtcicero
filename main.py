@@ -1,4 +1,5 @@
 from collections import deque
+import heapq
 from heapq import heappush, heappop 
 
 def shortest_shortest_path(graph, source):
@@ -13,19 +14,51 @@ def shortest_shortest_path(graph, source):
       (shortest path weight, shortest path number of edges). See test case for example.
     """
     ### TODO
-    pass
+    distance = {vertex: float('inf') for vertex in graph}
+    edge_count = {vertex: float('inf') for vertex in graph}
+    distance[source] = 0
+    edge_count[source] = 0
+
+    
+    pq = [(0, 0, source)]  
+
+    
+    while pq:
+        dist, edge_cnt, current = heapq.heappop(pq)
+        if dist > distance[current]:
+            continue
+        for neighbor, weight in graph[current]:
+            new_dist = dist + weight
+            new_edge_cnt = edge_cnt + 1
+            if new_dist < distance[neighbor] or (new_dist == distance[neighbor] and new_edge_cnt < edge_count[neighbor]):
+                distance[neighbor] = new_dist
+                edge_count[neighbor] = new_edge_cnt
+                heapq.heappush(pq, (new_dist, new_edge_cnt, neighbor))
+
+    
+    return distance, edge_count
     
 
     
     
 def bfs_path(graph, source):
-    """
-    Returns:
-      a dict where each key is a vertex and the value is the parent of 
-      that vertex in the shortest path tree.
-    """
-    ###TODO
-    pass
+  parent = {} 
+
+ 
+  queue = deque([source])
+
+ 
+  parent[source] = None
+
+  
+  while queue:
+    current = queue.popleft()
+    for neighbor in graph[current]:  
+          if neighbor not in parent:
+              parent[neighbor] = current
+              queue.append(neighbor)
+
+  return parent
 
 def get_sample_graph():
      return {'s': {'a', 'b'},
@@ -38,11 +71,15 @@ def get_sample_graph():
 
     
 def get_path(parents, destination):
-    """
-    Returns:
-      The shortest path from the source node to this destination node 
-      (excluding the destination node itself). See test_get_path for an example.
-    """
-    ###TODO
-    pass
+  path = []
+  current = destination
+  while current is not None:
+      path.append(current)
+      current = parents[current]  
+
+  path.reverse()
+
+  path_str = '->'.join(path)
+
+  return path_str
 
